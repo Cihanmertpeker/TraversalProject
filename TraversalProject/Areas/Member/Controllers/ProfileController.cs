@@ -52,5 +52,7 @@ namespace TraversalProject.Areas.Member.Controllers
 			}
 			return View();
 		}
+
+
 	}
 }

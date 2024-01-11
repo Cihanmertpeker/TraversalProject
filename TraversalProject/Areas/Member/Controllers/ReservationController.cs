@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Concrete;
 using DataAccessLayer.EntityFramework;
 using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -11,14 +12,33 @@ namespace TraversalProject.Areas.Member.Controllers
     {
         DestinationManager destinationManager = new(new EfDestinationDal());
         ReservationManager reservationManager = new(new EfReservationDal());
-        public IActionResult MyCurrentReservation()
+
+        private readonly UserManager<AppUser> _userManager;
+
+        public ReservationController(UserManager<AppUser> userManager)
         {
-            return View();
+            _userManager = userManager;
         }
 
-        public IActionResult MyOldReservation()
+        public async Task<IActionResult> MyCurrentReservation()
         {
-            return View();
+            var values = await _userManager.FindByNameAsync(User.Identity.Name);
+            var valuesList = reservationManager.GetListWithReservationByWaitApproval(values.Id);
+            return View(valuesList);
+        }
+
+        public async Task< IActionResult> MyOldReservation()
+        {
+            var values = await _userManager.FindByNameAsync(User.Identity.Name);
+            var valuesList = reservationManager.GetListWithReservationByPrevious(values.Id);
+            return View(valuesList);
+        }
+
+        public async Task<IActionResult> MyApprovalReservation()
+        {
+            var values = await _userManager.FindByNameAsync(User.Identity.Name);
+           var valuesList = reservationManager.GetListWithReservationByApproved(values.Id);
+            return View(valuesList);
         }
 
         public IActionResult NewReservation()
@@ -37,6 +57,7 @@ namespace TraversalProject.Areas.Member.Controllers
         public IActionResult NewReservation(Reservation p)
         {
             p.AppUserId = 1;
+            p.Status = "Onay bekliyor";
             reservationManager.Tadd(p);
             return RedirectToAction("MyCurrenReservation");
         }

@@ -18,6 +18,21 @@ namespace BusinessLayer.Concrete
             _reservationDal = reservationDal;
         }
 
+        public List<Reservation> GetListWithReservationByApproved(int id)
+        {
+            return _reservationDal.GetListWithReservationByApproved(id);
+        }
+
+        public List<Reservation> GetListWithReservationByPrevious(int id)
+        {
+            return _reservationDal.GetListWithReservationByPrevious(id);
+        }
+
+        public List<Reservation> GetListWithReservationByWaitApproval(int id)
+        {
+            return _reservationDal.GetListWithReservationByWaitApproval(id);
+        }
+
         public void Tadd(Reservation t)
         {
             _reservationDal.Insert(t);
