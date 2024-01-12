@@ -1,17 +1,26 @@
-﻿using BusinessLayer.Concrete;
+﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using DataAccessLayer.EntityFramework;
 using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TraversalProject.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [AllowAnonymous]
     public class DestinationController : Controller
     {
-        DestinationManager destinationManager = new DestinationManager(new EfDestinationDal());
+        private readonly IDestinationService _destinationService;
+
+        public DestinationController(IDestinationService destinationService)
+        {
+            _destinationService = destinationService;
+        }
+
         public IActionResult Index()
         {
-            var values = destinationManager.TGetlist();
+            var values = _destinationService.TGetlist();
             return View(values);
         }
 
@@ -24,26 +33,26 @@ namespace TraversalProject.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult AddDestination(Destination destination)
         {
-            destinationManager.Tadd(destination);
+            _destinationService.Tadd(destination);
             return RedirectToAction("Index");
         }
         public IActionResult DeleteDestination(int id)
         {
-            var values = destinationManager.TGetById(id);
-            destinationManager.TDelete(values);
-            return View("Index");
+            var values = _destinationService.TGetById(id);
+            _destinationService.TDelete(values);
+            return RedirectToAction("Index");
         }
 
         public IActionResult UpdateDestination(int id)
         {
-            var values = destinationManager.TGetById(id);
+            var values = _destinationService.TGetById(id);
             return View(values); 
         }
 
         [HttpPost]
         public IActionResult UpdateDestination(Destination destination)
         {
-             destinationManager.TUpdate(destination);
+            _destinationService.TUpdate(destination);
             return RedirectToAction("Index");
         }
     }
